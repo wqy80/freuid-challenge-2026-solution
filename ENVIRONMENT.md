@@ -1,34 +1,42 @@
 # Environment
 
-The inference Docker image is defined by `Dockerfile` and the pinned packages in
-`requirements-inference.txt`.
+Training and final validation used four NVIDIA A40 GPUs. The final Docker test
+ran on all 7,821 public images and produced valid output files.
 
-Training was run on four NVIDIA A40 GPUs. The exact server output must be
-captured from the training container with:
+## Validated runtime
 
-```bash
-bash scripts/capture_environment.sh environment/runtime
-```
-
-Run `scripts/capture_container_host.sh` on the Docker host to record the image,
-shared-memory setting, network mode, GPU driver, and container destinations.
-The script deliberately avoids dumping all environment variables.
-
-The generated files are local records and are ignored by Git. Copy the useful
-version numbers into this document after the capture is complete.
-
-## Training runtime
-
-- Operating system: pending capture
-- Python: pending capture
-- PyTorch: pending capture
-- CUDA runtime: pending capture
-- cuDNN: pending capture
+- Operating system: Ubuntu 24.04.1 LTS
+- Python: 3.12.3
+- PyTorch: 2.10.0+cu126
+- torchvision: 0.25.0+cu126
+- CUDA used by PyTorch: 12.6
+- cuDNN: 9.10.2
+- NVIDIA driver: 550.90.07
 - timm: 1.0.26
-- GPUs: 4 x NVIDIA A40, 48 GB class
+- NumPy: 2.4.4
+- pandas: 3.0.3
+- Pillow: 12.0.0
+- GPUs: 4 x NVIDIA A40, 46,068 MiB each
 
-## Inference runtime
+The validated local image was `freuid2026:offline-code-freeze`, image ID
+`sha256:10d3f01f566ed2baff6483d3c3269e6fb20db79a11850e8d5fcc4dd7c2516750`.
+The full four-GPU test used 32 GiB shared memory and read-only input mounted at
+`/data`. Output was written to `/submissions`.
 
-- Base image: `pytorch/pytorch:2.5.1-cuda11.8-cudnn9-runtime`
-- Python dependencies: `requirements-inference.txt`
-- Network access during inference: disabled
+The default single-GPU entry point passed a 32-image smoke test. The full
+7,821-image check used the optional four-GPU entry point.
+
+## Published Docker specification
+
+The public `Dockerfile` uses
+`pytorch/pytorch:2.5.1-cuda11.8-cudnn9-runtime` and installs the versions in
+`requirements-inference.txt`. Model inference does not need network access once
+the image and weights are available.
+
+The local server had no internet access, so the full test used the existing
+local runtime as the base image. The model code, frozen weights, entry points,
+candidate generation, and output checks were the same as in this repository.
+
+Raw environment records can be created with `scripts/capture_environment.sh`
+and `scripts/capture_container_host.sh`. They are kept outside Git because the
+full package list and Docker history are machine-specific.
