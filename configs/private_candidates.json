@@ -1,0 +1,19 @@
+{
+  "default_candidate": "private_localization",
+  "fullimage_weights": {
+    "convnext": 1.0,
+    "swinv2": 0.8
+  },
+  "resolution_safe": {
+    "default_swinv2_weight": 0.8,
+    "swinv2_weight_by_resolution": {
+      "1000x630": 1.2,
+      "840x530": 1.5
+    },
+    "swinv2_weight_by_short_side": [
+      {"max_short_side": 550, "weight": 1.5},
+      {"max_short_side": 650, "weight": 1.2}
+    ]
+  },
+  "localization_weight": 0.003
+}

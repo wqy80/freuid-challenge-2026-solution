@@ -1,0 +1,44 @@
+{
+  "name": "freuid_final",
+  "score_direction": "lower_is_better",
+  "models": {
+    "convnext": {
+      "architecture": "convnext_large.fb_in22k_ft_in1k",
+      "image_size": [992, 1568],
+      "folds": [0, 1, 2, 4],
+      "tta": "hflip",
+      "checkpoints": [
+        "weights/convnext_large_fold0.pt",
+        "weights/convnext_large_fold1.pt",
+        "weights/convnext_large_fold2.pt",
+        "weights/convnext_large_fold4.pt"
+      ]
+    },
+    "swinv2": {
+      "architecture": "swinv2_large_window12_192",
+      "image_size": [768, 1152],
+      "folds": [0, 1, 2],
+      "tta": "hflip",
+      "checkpoints": [
+        "weights/swinv2_large_fold0.pt",
+        "weights/swinv2_large_fold1.pt",
+        "weights/swinv2_large_fold2.pt"
+      ]
+    },
+    "synthetic_localization": {
+      "architecture": "convnext_base.fb_in22k_ft_in1k + FPN localization head",
+      "image_size": [672, 1056],
+      "folds": [2],
+      "epoch": 3,
+      "tta": "none",
+      "checkpoints": ["weights/synthetic_localization_fold2_epoch3.pt"]
+    }
+  },
+  "fusion": {
+    "convnext_to_swinv2": [1.0, 0.8],
+    "fullimage_to_synthetic_localization": [1.0, 0.003],
+    "space": "probability"
+  },
+  "private_candidate_config": "configs/private_candidates.json",
+  "default_private_candidate": "private_localization"
+}

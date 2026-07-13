@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+build/
+dist/
+out/
+submissions/
+*.log
+
+# FREUID data is proprietary and must never be committed.
+data/
+train/
+public_test/
+private_test/
+
+# Checkpoints are published as GitHub Release assets, not Git objects.
+weights/*.pt
+environment/runtime/
