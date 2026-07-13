@@ -33,6 +33,14 @@ The public `Dockerfile` uses
 `requirements-inference.txt`. Model inference does not need network access once
 the image and weights are available.
 
+The public Dockerfile was also built from scratch on WSL2 Ubuntu 22.04. The
+resulting image ID was
+`sha256:69c2e013071ef72f40ae1c95446c6f3e02ccb345a131bac2c52c99d32f725f30`.
+All eight weight files passed the size and SHA-256 checks during the build. The
+default entry point then completed an end-to-end CPU smoke test on one real
+image, including all eight checkpoints, candidate generation, and output
+validation.
+
 The local server had no internet access, so the full test used the existing
 local runtime as the base image. The model code, frozen weights, entry points,
 candidate generation, and output checks were the same as in this repository.
