@@ -29,6 +29,7 @@ def sha256(path: Path) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights-dir", required=True)
+    parser.add_argument("--manifest", default="")
     parser.add_argument("--write-manifest", default="")
     args = parser.parse_args()
     root = Path(args.weights_dir)
@@ -39,6 +40,27 @@ def main() -> None:
     for name in EXPECTED:
         path = root / name
         rows.append({"file": name, "size_bytes": path.stat().st_size, "sha256": sha256(path)})
+
+    manifest_path = Path(args.manifest) if args.manifest else root / "MANIFEST.csv"
+    if not manifest_path.is_file():
+        raise FileNotFoundError(f"weight manifest not found: {manifest_path}")
+    with manifest_path.open(newline="", encoding="utf-8") as handle:
+        manifest_rows = {row["file"]: row for row in csv.DictReader(handle)}
+    errors = []
+    for row in rows:
+        expected = manifest_rows.get(row["file"])
+        if expected is None:
+            errors.append(f"{row['file']}: missing from manifest")
+            continue
+        if row["size_bytes"] != int(expected["size_bytes"]):
+            errors.append(
+                f"{row['file']}: size {row['size_bytes']} != {expected['size_bytes']}"
+            )
+        if row["sha256"] != expected["sha256"]:
+            errors.append(f"{row['file']}: sha256 mismatch")
+    if errors:
+        raise RuntimeError("frozen weight validation failed:\n" + "\n".join(errors))
+
     if args.write_manifest:
         out = Path(args.write_manifest)
         out.parent.mkdir(parents=True, exist_ok=True)
