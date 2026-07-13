@@ -24,7 +24,8 @@ COPY configs /app/configs
 COPY docker /app/docker
 COPY weights /app/weights
 
-RUN chmod +x /app/docker/entrypoint.sh /app/docker/entrypoint_multigpu.sh \
+RUN find /app -type f -name '*.sh' -exec sed -i 's/\r$//' {} + \
+    && chmod +x /app/docker/entrypoint.sh /app/docker/entrypoint_multigpu.sh \
     && python /app/scripts/check_release_weights.py --weights-dir /app/weights
 
 ENTRYPOINT ["/app/docker/entrypoint.sh"]
